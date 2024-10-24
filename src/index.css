@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+input[type="checkbox"]:checked {
+  background-color: #f97316; /* orange-500 */
+  border: none; /* Sin borde azul */
+}
+
+@layer base {
+    body {
+      @apply antialiased;
+    }
+  }
+  
+  .dark {
+    color-scheme: dark;
+  }
