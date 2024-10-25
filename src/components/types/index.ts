@@ -8,6 +8,7 @@ export interface User {
     id: number;
     message: string;
     date: string;
+    read: boolean;
   }
   
   export interface BreadcrumbItem {
