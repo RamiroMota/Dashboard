@@ -53,15 +53,15 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="h-screen bg-white dark:bg-gray-800 w-80 sm:w-64 flex flex-col shadow-lg border-r border-gray-200 dark:border-gray-600">
+    <div className="h-screen bg-white dark:bg-gray-800 w-80 sm:w-70 flex flex-col shadow-lg border-r border-gray-200 dark:border-gray-600">
       <div className="p-4">
         <h1 className="text-xl font-bold text-gray-800 dark:text-white">Sistema Académico</h1>
       </div>
       
       <nav className="flex-1 overflow-y-auto">
         <ul className="space-y-2 p-4">
-          {menus.map((menu, index) => (
-            <li key={index}>
+          {menus.map((menu) => (
+            <li key={`${menu.title}-${menu.path}`}>
               {/* Se usa NavLink para el menú "Inicio" */}
               {menu.title === 'Inicio' ? (
                 <NavLink
@@ -79,6 +79,7 @@ const Sidebar = () => {
                 <div
                   className="flex items-center p-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                   onClick={() => toggleMenu(menu.title)}
+                  onKeyUp={(e) => e.key === 'Enter' && toggleMenu(menu.title)}
                 >
                   {menu.icon}
                   <span className="ml-3 truncate flex-1 overflow-hidden whitespace-nowrap">{menu.title}</span>
@@ -92,8 +93,8 @@ const Sidebar = () => {
 
               {menu.submenu && expandedMenus[menu.title] && (
                 <ul className="ml-6 mt-2 space-y-2">
-                  {menu.submenu.map((submenu, subIndex) => (
-                    <li key={subIndex}>
+                  {menu.submenu.map((submenu) => (
+                    <li key={`${submenu.title}-${submenu.path}`}>
                       <NavLink
                         to={submenu.path}
                         className={({ isActive }) =>
@@ -114,7 +115,7 @@ const Sidebar = () => {
       </nav>
       
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <button className="w-full flex items-center p-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+        <button type='button' className="w-full flex items-center p-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
           <HelpCircle size={16} />
           <span className="ml-2 truncate flex-1 overflow-hidden whitespace-nowrap">Soporte</span>
         </button>
