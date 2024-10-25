@@ -7,11 +7,14 @@ import {
   Settings, 
   HelpCircle, 
   ChevronRight, 
-  ChevronDown 
+  ChevronDown,
+  Menu,
+  X
 } from 'lucide-react';
 
 const Sidebar = () => {
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleMenu = (menuTitle: string) => {
     setExpandedMenus((prevState) => ({
@@ -20,11 +23,15 @@ const Sidebar = () => {
     }));
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const menus = [
     {
       title: 'Inicio',
       icon: <Home size={20} />,
-      path: '/', // Ruta de la página de inicio
+      path: '/',
     },
     {
       title: 'Dirección Académica',
@@ -123,7 +130,7 @@ const Sidebar = () => {
           versión 1.0
         </div>
       </div>
-    </div>
+  </div>
   );
 };
 
