@@ -7,14 +7,12 @@ import {
   Settings, 
   HelpCircle, 
   ChevronRight, 
-  ChevronDown,
-  Menu,
-  X
+  ChevronDown
 } from 'lucide-react';
 
 const Sidebar = () => {
   const [expandedMenus, setExpandedMenus] = useState<{ [key: string]: boolean }>({});
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  //const [isSidebarOpen, setIsSidebarOpen] = useState(false); (revisar después si es necesaria esta función)
 
   const toggleMenu = (menuTitle: string) => {
     setExpandedMenus((prevState) => ({
@@ -23,9 +21,9 @@ const Sidebar = () => {
     }));
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  //const toggleSidebar = () => {
+  //  setIsSidebarOpen(!isSidebarOpen);    (revisar después si es necesaria esta función)
+  //};
 
   const menus = [
     {
@@ -46,7 +44,8 @@ const Sidebar = () => {
       icon: <Search size={20} />,
       path: '/dir-investigacion',
       submenu: [
-        { title: 'Investigaciones', path: '/dir-investigacion/investigaciones' }
+        { title: 'Gestión de Investigaciones', path: '/dir-investigacion/gestion-invest' },
+        { title: 'Estado de Investigaciones', path: '/dir-investigacion/estado-invest' }
       ]
     },
     {
@@ -62,7 +61,7 @@ const Sidebar = () => {
   return (
     <div className="h-screen bg-white dark:bg-gray-800 w-80 sm:w-70 flex flex-col shadow-lg border-r border-gray-200 dark:border-gray-600">
       <div className="p-4">
-        <h1 className="text-xl font-bold text-gray-800 dark:text-white">Sistema Académico</h1>
+        <h1 className="text-xl font-bold text-gray-800 dark:text-white">Modelo Educativo</h1>
       </div>
       
       <nav className="flex-1 overflow-y-auto">
