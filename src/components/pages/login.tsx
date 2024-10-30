@@ -2,24 +2,23 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
+import  signInWithEmail  from '../../backend/auth/authUtils';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const setUser = useStore((state) => state.setUser);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulated login - in production, you would validate against a backend
-    if (email && password) {
-      setUser({
-        name: 'Fernando Arreola',
-        email: email,
-        role: 'Docente'
-      });
-      navigate('/');
+    // Llamar a la función de inicio de sesión con Supabase
+    const { success, message } = await signInWithEmail(email, password);
+    if (success) {
+      navigate('/'); // Navegar a la página principal en caso de éxito
+    } else {
+      // Manejar error (puedes mostrar un mensaje al usuario)
+      alert(message || 'Error al iniciar sesión');
     }
   };
 
@@ -63,7 +62,7 @@ const Login = () => {
                   <input
                     id="password"
                     name="password"
-                    type={showPassword ? 'text' : 'password'} // Cambiar tipo según estado
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -71,7 +70,7 @@ const Login = () => {
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)} // Cambiar estado al hacer clic
+                    onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -82,19 +81,19 @@ const Login = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 border-gray-300 rounded text-orange-500 bg-white checked:bg-orange-500 focus:ring-orange-500"
-              />
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 border-gray-300 rounded text-orange-500 bg-white checked:bg-orange-500 focus:ring-orange-500"
+                />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                   Recordarme
                 </label>
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-black hover:text-orange-500">
+                <a href="/" className="font-medium text-black hover:text-orange-500">
                   ¿Olvidaste tu contraseña?
                 </a>
               </div>
@@ -120,12 +119,12 @@ const Login = () => {
         <div className="absolute inset-0 flex items-center justify-center">
           {/* Diagonal slats */}
           <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply"></div>
+            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply" />
             <div className="slats-container">
-              <div className="slats"></div>
-              <div className="slats delay-200"></div>
-              <div className="slats delay-400"></div>
-              <div className="slats delay-600"></div>
+              <div className="slats" />
+              <div className="slats delay-200" />
+              <div className="slats delay-400" />
+              <div className="slats delay-600" />
             </div>
           </div>
         </div>
