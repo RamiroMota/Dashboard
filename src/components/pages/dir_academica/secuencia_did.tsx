@@ -35,7 +35,7 @@ const HoursCounter = ({ value, onChange }) => {
 
   const increase = useCallback(() => {
     onChange(value + 1);
-  }, [onChange]);
+  }, [value, onChange]);
 
   return (
     <div className="flex items-center ">
