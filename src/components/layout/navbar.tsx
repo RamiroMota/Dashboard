@@ -24,7 +24,8 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
     "dir-investigacion": "Dirección de Investigación",
     "dir-academica": "Dirección Académica",
     "secuencia": "Secuencia Didáctica",
-    "configpub": "Configuración"
+    "configpub": "Configuración",
+    "uploadfile": "Subir Archivo"
   };
 
   const getBreadcrumbs = () => {
