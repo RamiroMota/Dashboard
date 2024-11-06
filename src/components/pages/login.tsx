@@ -1,179 +1,153 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
+import AnimatedBackground from './AnimatedBackground';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isFading, setIsFading] = useState(false);
   const navigate = useNavigate();
   const setUser = useStore((state) => state.setUser);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulated login - in production, you would validate against a backend
-    if (email && password) {
-      setUser({
-        name: 'Fernando Arreola',
-        email: email,
-        role: 'Docente'
+    try {
+      const response = await fetch('http://localhost:5000/api/usuarios/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Correo: email, Password: password }),
       });
-      navigate('/');
+  
+      if (!response.ok) {
+        const message = await response.json();
+        setError(message.message || 'Error al iniciar sesión');
+        return;
+      }
+  
+      const data = await response.json();
+  
+      if (data.token && data.user) {
+        localStorage.setItem('authToken', data.token);
+        setUser({
+          name: `${data.user.Nombre} ${data.user.Apellidos}`,
+          email: data.user.Correo,
+          role: data.user.Rol,
+        });
+  
+        navigate('/');
+      } else {
+        setError(data.message || 'Error al iniciar sesión');
+      }
+    } catch (error) {
+      console.log(error);
+      setError('Error de red o servidor');
     }
   };
 
+  const handleCloseAlert = () => {
+    setIsFading(true);
+    setTimeout(() => setError(''), 500);
+  };
+
+  useEffect(() => {
+    if (error) {
+      setIsFading(false);
+      const timer = setTimeout(() => {
+        handleCloseAlert();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
+    <>
+      <AnimatedBackground />
+      <div className="relative flex items-center justify-center min-h-screen">
+        <div className="bg-white/80 backdrop-blur-md shadow-xl rounded-lg p-8 w-96 relative border border-white/20">
+          <div className="text-center mb-6">
             <LogIn className="mx-auto h-12 w-12 text-orange-500" />
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
-              Bienvenido de nuevo
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Ingresa tus credenciales para acceder al sistema
-            </p>
+            <h2 className="text-2xl font-bold text-gray-800">Bienvenido de nuevo</h2>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="rounded-md shadow-sm space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Correo electrónico
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
+          {error && (
+            <div
+              className={`absolute top-0 left-0 w-full bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md z-50 transition-opacity duration-500 ${
+                isFading ? 'opacity-0' : 'opacity-100'
+              }`}
+              role="alert"
+            >
+              <strong className="font-bold mr-2">Aviso</strong>
+              <span>{error}</span>
+              <button
+                type="button"
+                onClick={handleCloseAlert}
+                className="absolute top-0 right-0 mt-2 mr-2 text-red-500 hover:text-red-700"
+                aria-label="Cerrar alerta"
+              >
+                <svg className="fill-current h-6 w-6" viewBox="0 0 20 20">
+                  <title>Cerrar alerta</title>
+                  <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z" />
+                </svg>
+              </button>
+            </div>
+          )}
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'} // Cambiar tipo según estado
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)} // Cambiar estado al hacer clic
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-800">
+                Correo Electrónico
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="mt-1 block w-full px-3 py-2 bg-white/5 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
+                placeholder="correoinstitucional@upgch.mx"
+              />
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 border-gray-300 rounded text-orange-500 bg-white checked:bg-orange-500 focus:ring-orange-500"
-              />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                  Recordarme
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="font-medium text-black hover:text-orange-500">
-                  ¿Olvidaste tu contraseña?
-                </a>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-800">
+                Contraseña
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="mt-1 block w-full px-3 py-2 bg-white/5 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
+                  placeholder="********"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-800/70"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+              className="w-full bg-orange-600/80 text-gray-800/70 font-semibold py-2 rounded-lg hover:bg-gray-800 hover:text-white/80 transition duration-200"
             >
-              Iniciar sesión
+              Iniciar Sesión
             </button>
           </form>
         </div>
       </div>
-
-      {/* Right side - Image with diagonal slats effect */}
-      <div className="hidden lg:block relative flex-1">
-        <img
-          className="absolute inset-0 h-full w-full object-cover"
-          src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80"
-          alt="Education background"
-        />
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* Diagonal slats */}
-          <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-black opacity-30 mix-blend-multiply"></div>
-            <div className="slats-container">
-              <div className="slats"></div>
-              <div className="slats delay-200"></div>
-              <div className="slats delay-400"></div>
-              <div className="slats delay-600"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Styles for slats */}
-      <style>{`
-        .slats-container {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .slats {
-          position: absolute;
-          top: -50%;
-          left: -50%;
-          width: 200%;
-          height: 200%;
-          background: rgba(255, 255, 255, 0.5);
-          transform: rotate(-30deg);
-          animation: slide 5s infinite;
-        }
-
-        .slats.delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .slats.delay-400 {
-          animation-delay: 0.4s;
-        }
-
-        .slats.delay-600 {
-          animation-delay: 0.6s;
-        }
-
-        @keyframes slide {
-          0% {
-            transform: translateX(-100%) rotate(-30deg);
-          }
-          50% {
-            transform: translateX(100%) rotate(-30deg);
-          }
-          100% {
-            transform: translateX(-100%) rotate(-30deg);
-          }
-        }
-      `}</style>
-    </div>
+    </>
   );
 };
 
