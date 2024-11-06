@@ -12,6 +12,7 @@ import DirAcademica from './components/pages/dir_academica';
 import DirInvestigacion from './components/pages/dir_investigaciones';
 import Configpub from './components/pages/configpub';
 import Error404 from './components/pages/Error404';
+import UploadFile from './components/pages/FileUpload';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = useStore((state) => state.user);
@@ -36,12 +37,12 @@ function App() {
           }>
             <Route path="/" element={<Home />} />
             <Route path='/dir-academica' element={<DirAcademica />} />
-            <Route path="dir-academica/secuencia" element={<SecuenciaDidactica />} />
+              <Route path="dir-academica/secuencia" element={<SecuenciaDidactica />} />
             <Route path='/dir-investigacion' element={<DirInvestigacion />} />
-            <Route path="dir-investigacion/gestion-invest" element={<GestionInvest />} />
-            <Route path="dir-investigacion/estado-invest" element={<EstadoInvest />} />
+              <Route path="dir-investigacion/investigaciones" element={<GestionInvest />} />
             <Route path='/configpub' element={<Configpub />} />
-            <Route path="configpub/colores" element={<Colores />} />
+              <Route path="configpub/colores" element={<Colores />} />
+            <Route path="/uploadfile" element={<UploadFile />} />
             <Route path="*" element={<Error404 />} />
           </Route>
         </Routes>

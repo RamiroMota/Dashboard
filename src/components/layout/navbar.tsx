@@ -19,7 +19,8 @@ const Navbar: React.FC<NavbarProps> = ({ toggleSidebar }) => {
     "estado-invest": "Estado de Investigaciones",
     "dir-academica": "Dirección Académica",
     "secuencia": "Secuencia Didáctica",
-    "configpub": "Configuración"
+    "configpub": "Configuración",
+    "uploadfile": "Subir Archivo"
   };
 
   const getBreadcrumbs = () => {
