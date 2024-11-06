@@ -9,7 +9,8 @@ import {
   ChevronRight, 
   ChevronDown,
   Menu,
-  X
+  X,
+  Cloudy
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -56,6 +57,14 @@ const Sidebar = () => {
       submenu: [
         { title: 'Colores', path: '/configpub/colores' }
       ]
+    },
+    {
+      title: 'Documentación',
+      icon: <Cloudy size={20} />,
+      path: '/uploadfile',
+      submenu: [
+        { title: 'Almacenamiento', path: '/uploadfile' }
+      ]
     }
   ];
 
@@ -82,7 +91,7 @@ const Sidebar = () => {
       <div
         className={`fixed lg:static inset-y-0 left-0 z-40 transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 transition-transform duration-300 ease-in-out h-screen bg-white dark:bg-gray-800 w-72 sm:w-64 flex flex-col shadow-lg border-r border-gray-200 dark:border-gray-600`}
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out h-screen bg-white dark:bg-gray-800 w-72 sm:w-64 flex flex-col shadow-lg border-r  border-gray-200 dark:border-gray-600`}
       >
         <div className="p-4 flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-800 dark:text-white">Sistema Académico</h1>
