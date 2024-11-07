@@ -52,6 +52,7 @@ const Login = () => {
       const user = {
         id: data.user.id,
         nombre: data.user.name,
+        apellidos: data.user.apellidos,
         correo: data.user.email,
         rol: data.user.role,
       };
