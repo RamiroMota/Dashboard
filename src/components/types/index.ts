@@ -1,7 +1,9 @@
 export interface User {
-    name: string;
-    email: string;
-    role: string;
+    id: number | null;
+    nombre: string;
+    apellidos: string;
+    correo: string;
+    rol: string;
   }
   
   export interface Notification {

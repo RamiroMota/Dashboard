@@ -29,18 +29,17 @@ router.post('/login', async (req, res) => {
     // Crear un token JWT
     const token = jwt.sign(
       { userId: user.id }, // Datos del usuario que quieres incluir en el token
-      process.env.JWT_SECRET // Usar la clave secreta desde el archivo .env
-
+      process.env.JWT_SECRET
     );
-
+    
     // Responder con el token y los datos del usuario
     res.status(200).json({
       message: 'Autenticación exitosa',
       token: token,  // Incluir el token en la respuesta
       user: {
-        name: user.name,
-        email: user.email,
-        role: user.role
+        name: `${user.Nombre} ${user.Apellidos}`,
+        email: user.Correo,
+        role: user.Rol
       }
     });
   } catch (error) {

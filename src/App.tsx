@@ -4,8 +4,7 @@ import Login from './components/pages/login';
 import DashboardLayout from './components/layout/dashboarlayout';
 import { useStore } from './components/store/useStore';
 import SecuenciaDidactica from './components/pages/dir_academica/secuencia_did';
-import GestionInvest from './components/pages/dir_investigacion/gestion_investigaciones';
-import EstadoInvest from './components/pages/dir_investigacion/estado_investigaciones';
+import Investigaciones from './components/pages/dir_investigacion/investigaciones';
 import Colores from './components/pages/configpub/colores';
 import Home from './components/pages/Home';
 import DirAcademica from './components/pages/dir_academica';
@@ -39,7 +38,7 @@ function App() {
             <Route path='/dir-academica' element={<DirAcademica />} />
               <Route path="dir-academica/secuencia" element={<SecuenciaDidactica />} />
             <Route path='/dir-investigacion' element={<DirInvestigacion />} />
-              <Route path="dir-investigacion/investigaciones" element={<GestionInvest />} />
+              <Route path="dir-investigacion/investigaciones" element={<Investigaciones />} />
             <Route path='/configpub' element={<Configpub />} />
               <Route path="configpub/colores" element={<Colores />} />
             <Route path="/uploadfile" element={<UploadFile />} />

@@ -10,13 +10,13 @@ const Footer = () => {
           </div>
           <nav className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
             <a 
-              href="/" 
+              href="#" 
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
             >
               Términos
             </a>
             <a 
-              href="/" 
+              href="#" 
               className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
             >
               Privacidad

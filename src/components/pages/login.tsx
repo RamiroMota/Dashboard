@@ -5,61 +5,81 @@ import { LogIn, Eye, EyeOff } from 'lucide-react';
 import AnimatedBackground from './AnimatedBackground';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isFading, setIsFading] = useState(false);
   const navigate = useNavigate();
+  
+  // Se obtiene el método setUser de la tienda global
+  const { user, setUser } = useStore();
 
+  // Función para manejar los cambios en los campos del formulario
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [id]: value,
+    }));
+  };
+
+  // Función para manejar el envío del formulario (login)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const { email, password } = formData;
+
     try {
+      // Se hace la solicitud POST para autenticar al usuario
       const response = await fetch('http://localhost:5000/api/usuarios/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Correo: email, Password: password }),
       });
-  
+
       if (!response.ok) {
         const message = await response.json();
         setError(message.message || 'Error al iniciar sesión');
         return;
       }
-  
+
       const data = await response.json();
-  
+
       if (data.token && data.user) {
+        // Guardamos el token en el localStorage
         localStorage.setItem('authToken', data.token);
-        setUser({
-          name: `${data.user.Nombre} ${data.user.Apellidos}`,
-          email: data.user.Correo,
-          role: data.user.Rol,
-        });
-  
+
+      // Actualizamos el estado del usuario
+      const user = {
+        id: data.user.id,
+        nombre: data.user.name,
+        correo: data.user.email,
+        rol: data.user.role,
+      };
+      setUser(user);
+
+        // Redirigimos al dashboard
+        
         navigate('/');
       } else {
         setError(data.message || 'Error al iniciar sesión');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setError('Error de red o servidor');
     }
   };
 
+  // Función para manejar el cierre de la alerta de error
   const handleCloseAlert = () => {
     setIsFading(true);
     setTimeout(() => setError(''), 500);
   };
 
+  // Efecto para manejar el fade de la alerta de error
   useEffect(() => {
     if (error) {
       setIsFading(false);
-      const timer = setTimeout(() => {
-        handleCloseAlert();
-      }, 2000);
+      const timer = setTimeout(handleCloseAlert, 2000);
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -105,10 +125,10 @@ const Login = () => {
               <input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleInputChange}
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white/5 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
+                className="mt-1 block w-full px-3 py-2 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
                 placeholder="correoinstitucional@upgch.mx"
               />
             </div>
@@ -121,10 +141,10 @@ const Login = () => {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleInputChange}
                   required
-                  className="mt-1 block w-full px-3 py-2 bg-white/5 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
+                  className="mt-1 block w-full px-3 py-2 border-gray-800/70 focus:border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/70 text-gray-800 placeholder-gray-800/70"
                   placeholder="********"
                 />
                 <button
