@@ -18,7 +18,7 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
   const [selectedNotification, setSelectedNotification] = useState<string | null>(null);
   const location = useLocation();
   const { darkMode, toggleDarkMode, notifications, user } = useStore();
-
+  
   // Mapeo de rutas a nombres legibles
   const routeNames: { [key: string]: string } = {
     "dir-investigacion": "Dirección de Investigación",
@@ -107,7 +107,6 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      
                       onClick={() => handleNotificationClick(notification.id, notification.message)}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -117,9 +116,9 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
                       tabIndex={0}
                       className={`px-4 py-2 ${notification.read ? 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-200' : 'bg-blue-100 dark:bg-blue-600 text-gray-800 dark:text-gray-200 cursor-pointer'}`}
                     >
-                    <p className="text-sm">{notification.message}</p>
-                    <p className="text-xs text-gray-400">{notification.date}</p>
-                  </div>
+                      <p className="text-sm">{notification.message}</p>
+                      <p className="text-xs text-gray-400">{notification.date}</p>
+                    </div>
                   ))}
                 </div>
               )}
@@ -147,13 +146,14 @@ const Navbar = ({ toggleSidebar }: { toggleSidebar: () => void }) => {
                 <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-lg shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700">
                   <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                     <p className="font-medium text-gray-800 dark:text-white">
-                      {user?.name || 'Fernando Arreola'}
+                      {user?.nombre}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {user?.email || 'example@abc.com'}
+                      {user?.correo}
+                      
                     </p>
                     <span className="inline-block px-2 py-1 mt-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-md">
-                      {user?.role || 'Docente'}
+                      {user?.rol}
                     </span>
                   </div>
                   <Link
