@@ -1,5 +1,5 @@
 import { FileItem } from '../../types/file';
-import { FileText, Image, File, Trash2, ExternalLink } from 'lucide-react';
+import { FileText, Image, File, Trash2, ExternalLink, CloudDownload } from 'lucide-react';
 import { formatFileSize } from '../../utils/formatters';
 
 interface FileListProps {
@@ -61,21 +61,21 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
                   href={file.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-500 dark:text-orange-400 dark:hover:text-orange-500 hover:text-blue-700 flex items-center gap-1 text-sm"
+                  className="dark:text-gray-400 dark:hover:text-white dark:hover:bg-orange-500 rounded-md text-blue-400  hover:text-white hover:bg-orange-500 transition-colors flex items-center gap-1 p-2 text-sm"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Previsualizar
                 </a>
                 <button
                   onClick={() => onDelete(file.id)}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-blue-500 rounded-full text-blue-400  hover:text-white hover:bg-blue-500 transition-colors"
                   title="Eliminar archivo"
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <CloudDownload className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => onDelete(file.id)}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-2 dark:text-gray-400 dark:hover:text-white dark:hover:bg-red-500 rounded-full text-blue-400  hover:text-white hover:bg-red-500 transition-colors"
                   title="Eliminar archivo"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -137,13 +137,19 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
                       href={file.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-700"
+                      className="text-blue-500 hover:text-orange-500"
                     >
                       <ExternalLink className="w-5 h-5" />
                     </a>
                     <button
                       onClick={() => onDelete(file.id)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-gray-300 hover:text-blue-500"
+                    >
+                      <CloudDownload className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={() => onDelete(file.id)}
+                      className="text-gray-300 hover:text-red-500"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
