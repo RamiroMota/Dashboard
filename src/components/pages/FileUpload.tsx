@@ -46,10 +46,10 @@ function FileUpload() {
   }, [files, searchTerm, selectedType]);
 
   return (
-    <div className="min-h-screen dark:bg-slate-800 rounded-lg bg-gray-50">
+    <div className="min-h-screen dark:bg-slate-800 rounded-lg bg-gray-50 shadow-lg shadow-gray-300 dark:shadow-none">
       <div className="max-w-7xl mx-auto p-6">
         <div className="flex items-center space-x-4 mb-8">
-          <FolderOpen className="w-8 h-8 text-slate-300" />
+          <FolderOpen className="w-8 h-8 text-orange-500" />
           <h1 className="text-2xl font-bold dark:text-white text-gray-900">
             Gestor de Archivos
           </h1>

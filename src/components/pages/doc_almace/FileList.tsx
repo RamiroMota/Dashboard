@@ -23,9 +23,9 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
         {files.map((file) => (
           <div
             key={file.id}
-            className="bg-white dark:bg-slate-700 rounded-lg shadow-sm hover:shadow-lg transition-shadow overflow-hidden"
+            className="bg-white dark:bg-slate-700 rounded-lg shadow-lg hover:shadow-lg transition-shadow overflow-hidden"
           >
-            <div className="aspect-video relative dark:bg-slate-600 bg-gray-500">
+            <div className="aspect-video relative dark:bg-slate-600 bg-gray-400">
               {isImage(file.type) ? (
                 <img
                   src={file.url}
@@ -34,7 +34,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <div className="text-gray-400 dark:text-gray-300 transform scale-150">
+                  <div className="text-white dark:text-gray-300 transform scale-150">
                     {getFileIcon(file.type)}
                   </div>
                 </div>
@@ -92,23 +92,23 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 dark:bg-slate-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Archivo
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Tamaño
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Fecha
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-gray-200 dark:bg-slate-700">
             {files.map((file) => (
               <tr key={file.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -117,17 +117,17 @@ export const FileList: React.FC<FileListProps> = ({ files, onDelete, isGridView 
                       {getFileIcon(file.type)}
                     </div>
                     <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900 truncate max-w-xs" title={file.name}>
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-300 truncate max-w-xs" title={file.name}>
                         {file.name}
                       </div>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{formatFileSize(file.size)}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-300">{formatFileSize(file.size)}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-gray-300">
                     {new Date(file.createdAt).toLocaleDateString()}
                   </div>
                 </td>
