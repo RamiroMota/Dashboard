@@ -54,7 +54,7 @@ const Login = () => {
         nombre: data.user.name,
         apellidos: data.user.apellidos,
         correo: data.user.email,
-        rol: data.user.role,
+        rol: data.user.roleName,
       };
       setUser(user);
 
