@@ -53,9 +53,11 @@ const Sidebar = () => {
     {
       title: 'Configuración',
       icon: <Settings size={20} />,
-      path: '/configpub',
+      path: '/configuracion',
       submenu: [
-        { title: 'Colores', path: '/configpub/colores' }
+        { title: 'Gestión de Usuarios', path: '/configuracion/gestionusuarios' },
+        { title: 'General', path: '/configuracion/general' },
+        { title: 'Registro de Sistema', path: '/configuracion/regsistema' }
       ]
     },
     {
@@ -71,7 +73,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Botón de menú móvil */}
-      <button
+      <button type='button'
         onClick={toggleSidebar}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-600"
         aria-label="Toggle menu"
@@ -84,6 +86,12 @@ const Sidebar = () => {
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={toggleSidebar}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              toggleSidebar();
+            }
+          }}
+          tabIndex={0}
         />
       )}
   
@@ -99,8 +107,8 @@ const Sidebar = () => {
   
         <nav className="flex-1 overflow-y-auto">
           <ul className="space-y-2 p-4">
-            {menus.map((menu, index) => (
-              <li key={index}>
+            {menus.map((menu) => (
+              <li key={menu.title}>
                 {menu.title === 'Inicio' ? (
                   <NavLink
                     to={menu.path}
@@ -120,6 +128,12 @@ const Sidebar = () => {
                   <div
                     className="flex items-center p-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                     onClick={() => toggleMenu(menu.title)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        toggleMenu(menu.title);
+                      }
+                    }}
+                    tabIndex={0}
                   >
                     {menu.icon}
                     <span className="ml-3 truncate flex-1 overflow-hidden whitespace-nowrap">
@@ -137,8 +151,8 @@ const Sidebar = () => {
   
                 {menu.submenu && expandedMenus[menu.title] && (
                   <ul className="ml-6 mt-2 space-y-2">
-                    {menu.submenu.map((submenu, subIndex) => (
-                      <li key={subIndex}>
+                    {menu.submenu.map((submenu) => (
+                      <li key={submenu.title}>
                         <NavLink
                           to={submenu.path}
                           onClick={() => setIsSidebarOpen(false)}
