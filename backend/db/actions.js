@@ -11,20 +11,29 @@ mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.error('Error al conectar a MongoDB:', err));
 
 const getUsuarios = async () => {
-    try {
-      const usuarios = await User.find().exec({ timeout: 30000 });
-      return usuarios.map(usuario => ({
-        id: usuario._id,
-        nombre: usuario.Nombre,
-        apellidos: usuario.Apellidos,
-        correo: usuario.Correo,
-        rol: usuario.Rol,
-        funcion: usuario.Funcion
-      }));
-    } catch (err) {
-      console.error(err);
-      throw err;
+  return User.aggregate([
+    {
+      $lookup: { // Realiza un "join" con la colección 'roles'
+        from: 'roles',
+        localField: 'Rol', // Campo en usuarios
+        foreignField: 'roleId', // Campo en roles
+        as: 'roleInfo', // Los resultados del join se guardarán en 'roleInfo'
+      }
+    },
+    { $unwind: '$roleInfo' }, // Extrae el objeto roleInfo del array
+    {
+      $project: { // Proyecta solo los campos que necesitamos
+        Nombre: 1,
+        Apellidos: 1,
+        Correo: 1,
+        Rol: 1,
+        Funcion:1,
+        roleName: '$roleInfo.roleName', // Incluye roleName del objeto 'roleInfo'
+        CreadoEl: 1,
+        ActualizadoEl: 1
+      }
     }
-  };
+  ]);
+};
 
 module.exports = { getUsuarios };
