@@ -73,4 +73,17 @@ router.post('/login', async (req, res) => {
   }
 });
 
+const { getUsuarios } = require('../db/actions'); //importar getusuarios para visualización de coleccion usuarios en tabla
+// Ruta para obtener todos los usuarios
+router.get('/', async (req, res) => {
+  try {
+    const usuarios = await getUsuarios();  // Usar la función getUsuarios
+    res.status(200).json({ usuarios });     // Enviar los usuarios como respuesta
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener los usuarios' });
+  }
+});
+
+
 module.exports = router;
