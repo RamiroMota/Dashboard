@@ -24,11 +24,14 @@ const UserGestion: React.FC = () => {
               <Link to={modulo.route} aria-current="page">
                 <button
                   type="button"
-                  className={`flex items-center justify-center gap-2 p-3 text-sm font-medium ${
+                  className={`flex items-center justify-center gap-2 p-3 text-sm font-medium transition-transform duration-300 ${
                     location.pathname === modulo.route
-                      ? 'border-b-2 border-gray-900 text-primary' // Solo el tab activo tiene borde inferior
-                      : 'border-b-2 border-transparent text-muted-foreground hover:border-muted hover:text-foreground'
+                      ? 'border-b-2 border-blue-500 text-blue-600 bg-blue-100 shadow-md' // Estilo para el tab activo
+                      : 'border-b-2 border-transparent text-gray-600 hover:border-blue-300 hover:text-blue-500'
                   }`}
+                  style={{
+                    transform: location.pathname === modulo.route ? 'translateY(-2px)' : 'translateY(0)', // Efecto de desplazamiento en el activo
+                  }}
                 >
                   {icons[modulo.id as keyof typeof icons] || <FileText className="h-4 w-4" />}
                   {modulo.name}
