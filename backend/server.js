@@ -46,7 +46,6 @@ conn.once('open', () => {
   gfs = new GridFSBucket(conn.db, {
     bucketName: 'uploads',
   });
-  console.log('Conectado a la base de datos MongoDB y configurado GridFS');
 });
 
 // Rutas
