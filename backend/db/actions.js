@@ -7,8 +7,6 @@ dotenv.config();
 
 // Conectar a MongoDB
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('Conectado a MongoDB'))
-.catch(err => console.error('Error al conectar a MongoDB:', err));
 
 const getUsuarios = async () => {
   return User.aggregate([

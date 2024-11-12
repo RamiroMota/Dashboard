@@ -15,7 +15,6 @@ import ConfigGeneral from './components/pages/config/general';
 import UserGestion from './components/pages/config/userGestion';
 import SistemaReg from './components/pages/config/sistemaReg';
 import UserList from './components/pages/config/usergest/userlist';
-import UserAcciones from './components/pages/config/usergest/acciones';
 import UserRolesPermisos from './components/pages/config/usergest/rolespermisos';
 
 // Componente de ruta protegida
@@ -48,7 +47,6 @@ function App() {
             <Route path='/configuracion' element={<Configuracion />} />
             <Route path="configuracion/gestionusuarios/" element={<UserGestion />} >
               <Route path="/configuracion/gestionusuarios/userlist" element={<UserList />} />
-              <Route path="/configuracion/gestionusuarios/acciones" element={<UserAcciones />} />
               <Route path="/configuracion/gestionusuarios/rolespermisos" element={<UserRolesPermisos />} />
             </Route>
             <Route path="configuracion/general" element={<ConfigGeneral />} />
