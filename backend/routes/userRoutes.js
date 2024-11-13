@@ -64,7 +64,7 @@ router.post('/login', async (req, res) => {
         name: `${userData.Nombre} ${userData.Apellidos}`,
         email: userData.Correo,
         role: userData.Rol,
-        roleName: userData.roleName// Aquí se incluye el `roleName` obtenido
+        roleName: userData.roleName // Aquí se incluye el `roleName` obtenido
       }
     });
   } catch (error) {
@@ -73,8 +73,8 @@ router.post('/login', async (req, res) => {
   }
 });
 
-const { getUsuarios } = require('../db/actions'); //importar getusuarios para visualización de coleccion usuarios en tabla
 // Ruta para obtener todos los usuarios
+const { getUsuarios } = require('../db/actions'); //importar getusuarios para visualización de colección usuarios en tabla
 router.get('/', async (req, res) => {
   try {
     const usuarios = await getUsuarios();  // Usar la función getUsuarios
@@ -85,5 +85,36 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Ruta para obtener los roles
+router.get('/roles', async (req, res) => {
+  try {
+    // Realiza la consulta para obtener los roles
+    const roles = await User.aggregate([
+      {
+        $lookup: {
+          from: 'roles',
+          localField: 'Rol',
+          foreignField: 'roleId',
+          as: 'roleInfo',
+        },
+      },
+      { $unwind: '$roleInfo' },
+      {
+        $project: {
+          roleName: '$roleInfo.roleName',
+        },
+      },
+    ]);
+
+    // Extrae los nombres de los roles de la consulta
+    const roleNames = roles.map(role => role.roleName);
+
+    // Devolver los nombres de los roles en formato JSON
+    res.json(roleNames);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener roles' });
+  }
+});
 
 module.exports = router;
