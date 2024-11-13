@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface UserAddModalProps {
   isOpen: boolean;
@@ -22,6 +22,8 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
   const [contraseña, setContraseña] = useState('');
   const [rol, setRol] = useState('');
   const [funcion, setFuncion] = useState('');
+  const [showConfirmClose, setShowConfirmClose] = useState(false);
+  const nombreRef = useRef<HTMLInputElement>(null); // Crear referencia para el campo "Nombre"
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,25 +39,36 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
     toggleModal();
   };
 
+  const closeModal = () => {
+    if (nombre || apellidos || correo || contraseña || rol || funcion) {
+      setShowConfirmClose(true); // Mostrar confirmación si hay datos
+    } else {
+      toggleModal(); // Cerrar directamente si está vacío
+    }
+  };
+
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isOpen) {
+      closeModal();
+    }
+  };
+
   useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && isOpen) {
-        toggleModal();
-      }
-    };
-
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [isOpen, toggleModal]);
+  }, [isOpen, nombre, apellidos, correo, contraseña, rol, funcion]);
+
+  useEffect(() => {
+    if (isOpen && nombreRef.current) {
+      nombreRef.current.focus(); // Enfocar automáticamente en el campo "Nombre" al abrir el modal
+    }
+  }, [isOpen]);
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50 ${
-        isOpen ? '' : 'hidden'
-      }`}
+      className={`fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-50 ${isOpen ? '' : 'hidden'}`}
     >
       <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md z-60">
         <h2 className="text-2xl mb-4">Agregar Usuario</h2>
@@ -67,6 +80,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+              ref={nombreRef} // Asignar la referencia al campo "Nombre"
               className="w-full border rounded p-2"
               required
             />
@@ -139,7 +153,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
           <div className="flex justify-between">
             <button
               type="button"
-              onClick={toggleModal}
+              onClick={closeModal}
               className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-700 transition"
             >
               Cancelar
@@ -152,6 +166,31 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
             </button>
           </div>
         </form>
+
+        {showConfirmClose && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-60">
+            <div className="bg-white p-4 rounded-md shadow-lg w-full max-w-sm">
+              <p className="mb-4">¿Estás seguro que deseas cerrar el formulario?</p>
+              <div className="flex justify-center">
+                <button
+                  className="px-6 py-2 mx-6 bg-red-500 text-white rounded hover:bg-red-700 transition"
+                  onClick={() => {
+                    setShowConfirmClose(false);
+                    toggleModal();
+                  }}
+                >
+                  Sí
+                </button>
+                <button
+                  className="px-6 py-2 mx-6 bg-gray-400 text-white rounded hover:bg-gray-700 transition"
+                  onClick={() => setShowConfirmClose(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
