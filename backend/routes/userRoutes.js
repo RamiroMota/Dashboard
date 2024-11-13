@@ -2,6 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Asegúrate de que la ruta sea correcta
 const dotenv = require('dotenv');
+const { agregarUsuario } = require('../db/actions');
 
 // Cargar las variables de entorno
 dotenv.config();
@@ -13,58 +14,34 @@ router.post('/login', async (req, res) => {
   const { Correo, Password } = req.body;
 
   try {
-    // Paso 1: Buscar al usuario y hacer el `lookup` para obtener `roleName`
-    const user = await User.aggregate([
-      { $match: { Correo } }, // Busca el usuario por correo
-      {
-        $lookup: { // Hacer un "join" con la colección roles
-          from: 'roles',
-          localField: 'Rol', // Campo en usuarios
-          foreignField: 'roleId', // Campo en roles
-          as: 'roleInfo' // El resultado se guardará en roleInfo
-        }
-      },
-      { $unwind: '$roleInfo' }, // Extrae el objeto roleInfo de un array
-      {
-        $project: { // Selecciona solo los campos necesarios
-          Nombre: 1,
-          Apellidos: 1,
-          Correo: 1,
-          Password: 1,
-          Rol: 1,
-          roleName: '$roleInfo.roleName' // Agrega roleName al resultado
-        }
-      }
-    ]);
+    // Paso 1: Buscar al usuario directamente en la colección de usuarios
+    const user = await User.findOne({ Correo });
 
     // Paso 2: Verificar si se encontró el usuario
-    if (!user.length) {
+    if (!user) {
       return res.status(401).json({ message: 'Datos incorrectos, favor de verificar' });
     }
 
-    const [userData] = user; // Extrae el usuario del array
-
     // Paso 3: Verificar que la contraseña coincida (sin bcrypt)
-    const isPasswordValid = Password === userData.Password;
+    const isPasswordValid = Password === user.Password;
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Datos incorrectos, favor de verificar' });
     }
 
     // Paso 4: Crear un token JWT
     const token = jwt.sign(
-      { userId: userData._id },
+      { userId: user._id },
       process.env.JWT_SECRET
     );
 
-    // Paso 5: Responder con el token y los datos del usuario, incluyendo `roleName`
+    // Paso 5: Responder con el token y los datos del usuario
     res.status(200).json({
       message: 'Autenticación exitosa',
       token: token,
       user: {
-        name: `${userData.Nombre} ${userData.Apellidos}`,
-        email: userData.Correo,
-        role: userData.Rol,
-        roleName: userData.roleName // Aquí se incluye el `roleName` obtenido
+        name: `${user.Nombre} ${user.Apellidos}`,
+        email: user.Correo,
+        role: user.Rol // El rol ahora es directamente un string
       }
     });
   } catch (error) {
@@ -74,7 +51,7 @@ router.post('/login', async (req, res) => {
 });
 
 // Ruta para obtener todos los usuarios
-const { getUsuarios } = require('../db/actions'); //importar getusuarios para visualización de colección usuarios en tabla
+const { getUsuarios } = require('../db/actions'); // Importar getUsuarios para visualización de colección usuarios en tabla
 router.get('/', async (req, res) => {
   try {
     const usuarios = await getUsuarios();  // Usar la función getUsuarios
@@ -85,35 +62,24 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Ruta para obtener los roles
-router.get('/roles', async (req, res) => {
+//Ruta para crear usuarios
+router.post('/crear', async (req, res) => {
+  const { Nombre, Apellidos, Correo, Contraseña, Rol, Funcion } = req.body;
+
+  // Valida los datos básicos
+  if (!Nombre || !Apellidos || !Correo || !Contraseña || !Rol || !Funcion) {
+    return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+  }
+
   try {
-    // Realiza la consulta para obtener los roles
-    const roles = await User.aggregate([
-      {
-        $lookup: {
-          from: 'roles',
-          localField: 'Rol',
-          foreignField: 'roleId',
-          as: 'roleInfo',
-        },
-      },
-      { $unwind: '$roleInfo' },
-      {
-        $project: {
-          roleName: '$roleInfo.roleName',
-        },
-      },
-    ]);
-
-    // Extrae los nombres de los roles de la consulta
-    const roleNames = roles.map(role => role.roleName);
-
-    // Devolver los nombres de los roles en formato JSON
-    res.json(roleNames);
+    // Crear usuario
+    const usuarioCreado = await agregarUsuario({ Nombre, Apellidos, Correo, Contraseña, Rol, Funcion });
+    res.status(201).json({
+      message: 'Usuario creado exitosamente',
+      user: usuarioCreado
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener roles' });
+    res.status(500).json({ message: 'Error al crear el usuario', error: error.message });
   }
 });
 

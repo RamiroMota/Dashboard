@@ -6,29 +6,25 @@ const User = require('../models/User');  // Importar el modelo de User
 dotenv.config();
 
 const getUsuarios = async () => {
-  return User.aggregate([
-    {
-      $lookup: { // Realiza un "join" con la colección 'roles'
-        from: 'roles',
-        localField: 'Rol', // Campo en usuarios
-        foreignField: 'roleId', // Campo en roles
-        as: 'roleInfo', // Los resultados del join se guardarán en 'roleInfo'
-      }
-    },
-    { $unwind: '$roleInfo' }, // Extrae el objeto roleInfo del array
-    {
-      $project: { // Proyecta solo los campos que necesitamos
-        Nombre: 1,
-        Apellidos: 1,
-        Correo: 1,
-        Rol: 1,
-        Funcion:1,
-        roleName: '$roleInfo.roleName', // Incluye roleName del objeto 'roleInfo'
-        CreadoEl: 1,
-        ActualizadoEl: 1
-      }
-    }
-  ]);
+  try {
+    const usuarios = await User.find();
+    return usuarios;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
-module.exports = { getUsuarios };
+const agregarUsuario = async (nuevoUsuario) => {
+  try {
+    // Crear un nuevo usuario en la base de datos
+    const usuario = new User(nuevoUsuario);
+    await usuario.save();  // Guardar el usuario en la base de datos
+    return usuario;  // Devolver el usuario creado
+  } catch (error) {
+    console.error(error);
+    throw error;  // Propagar el error si ocurre
+  }
+};
+
+module.exports = { getUsuarios, agregarUsuario };

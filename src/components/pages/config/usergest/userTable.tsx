@@ -80,7 +80,7 @@ const UserTable: React.FC<UserTableProps> = ({
                 {usuario.Nombre} {usuario.Apellidos}
               </td>
               <td className="py-2 px-4 border-b">{usuario.Correo}</td>
-              <td className="py-2 px-4 border-b">{usuario.roleName}</td>
+              <td className="py-2 px-4 border-b">{usuario.Rol}</td>
               <td className="py-2 px-4 border-b">{usuario.Funcion}</td>
               <td className="py-2 px-4 border-b text-[10px]">
                 {formatDate(usuario.CreadoEl)}

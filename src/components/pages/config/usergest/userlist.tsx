@@ -6,6 +6,7 @@ import Pagination from './userPagination';
 import UserBotones from './userBotones';
 import { User } from '../../../types/userTypes';
 import UserAddModal from './userAddModal';
+import { agregarUsuario } from '../../../db/actions';
 
 const UserList: React.FC = () => {
   const [usuarios, setUsuarios] = useState<User[]>([]);
@@ -15,43 +16,54 @@ const UserList: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredUsuarios, setFilteredUsuarios] = useState<User[]>([]); // Para los usuarios filtrados
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       const response = await axios.get('http://localhost:5000/api/usuarios');
       setUsuarios(response.data.usuarios);
+      setFilteredUsuarios(response.data.usuarios); // Al principio, no hay filtro
     };
     fetchUsuarios();
   }, []);
 
+  // Función para manejar la búsqueda de usuarios
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchQuery = e.target.value;
     setSearchTerm(searchQuery);
 
     if (searchQuery.trim() !== '') {
-      const firstMatchingUserIndex = usuarios.findIndex(usuario =>
+      const filtered = usuarios.filter(usuario =>
         highlightSearchMatch(usuario, searchQuery)
       );
-
+      setFilteredUsuarios(filtered);
+      const firstMatchingUserIndex = filtered.findIndex(usuario =>
+        highlightSearchMatch(usuario, searchQuery)
+      );
       if (firstMatchingUserIndex >= 0) {
         const newPage = Math.ceil((firstMatchingUserIndex + 1) / 6); // Usa 6 usuarios por página
         setCurrentPage(newPage);
       }
     } else {
+      setFilteredUsuarios(usuarios); // Si no hay búsqueda, mostrar todos los usuarios
       setCurrentPage(1); // Restablece a la primera página si no hay búsqueda
     }
   };
 
+  // Toggle para el modal
   const toggleModal = () => setIsModalOpen(!isModalOpen);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
+  // Función que maneja el clic en una fila
   const handleRowClick = (usuario: User) => {
     setSelectedUser(usuario);
     setIsModalOpen(true);
   };
 
+  // Función para la paginación
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  // Función para resaltar los términos que coinciden en la búsqueda
   const highlightSearchMatch = (usuario: User, searchTerm: string): boolean => {
     return (
       usuario.Nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -59,15 +71,28 @@ const UserList: React.FC = () => {
     );
   };
 
-  // Funciones para los clics de Agregar y Editar
+  // Función para abrir el modal de agregar usuario
   const handleAddClick = () => {
-    setIsAddModalOpen(true); // Abre el modal de agregar
+    setIsAddModalOpen(true);
   };
 
-  const handleEditClick = () => {
-    // Lógica para el botón de editar
-    console.log("Editar usuario");
+  // Función para agregar un nuevo usuario usando la API
+  const handleAddUser = async (newUser: User) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/usuarios/crear', newUser);
+      const addedUser = response.data.user;
+      setUsuarios([...usuarios, addedUser]);
+      setFilteredUsuarios([...filteredUsuarios, addedUser]);
+      setIsAddModalOpen(false); // Cierra el modal después de agregar
+    } catch (error) {
+      console.error("Error al agregar usuario:", error);
+    }
   };
+
+  // Lógica para la paginación de usuarios filtrados
+  const itemsPerPage = 6;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentUsuarios = filteredUsuarios.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="relative">
@@ -79,11 +104,11 @@ const UserList: React.FC = () => {
           onChange={handleSearch}
           className="w-1/3 border rounded-md p-2"
         />
-        <UserBotones onAddClick={handleAddClick} onEditClick={handleEditClick} onDelClick={handleAddClick} onPermisosClick={handleAddClick}  />
+        <UserBotones onAddClick={handleAddClick} />
       </div>
       <div className="mb-4">
         <UserTable
-          usuarios={usuarios}
+          usuarios={currentUsuarios} // Ahora se pasa la lista filtrada de usuarios
           handleRowClick={handleRowClick}
           searchTerm={searchTerm}
           highlightSearchMatch={highlightSearchMatch}
@@ -103,14 +128,14 @@ const UserList: React.FC = () => {
         <UserAddModal
           isOpen={isAddModalOpen}
           toggleModal={() => setIsAddModalOpen(false)}
-          onAddUser={(newUser) => console.log("Nuevo usuario agregado:", newUser)}
+          onAddUser={handleAddUser} // Usa la función handleAddUser
         />
       )}
       {/* Los controles de paginación se colocan justo debajo de la tabla */}
       <div className="mt-4">
         <Pagination
           currentPage={currentPage}
-          totalPages={Math.ceil(usuarios.length / 7)}
+          totalPages={Math.ceil(filteredUsuarios.length / itemsPerPage)} // Calcula las páginas según los usuarios filtrados
           paginate={paginate}
         />
       </div>

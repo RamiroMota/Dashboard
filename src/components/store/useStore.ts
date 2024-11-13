@@ -16,30 +16,19 @@ interface Store {
 
 export const useStore = create<Store>((set) => ({
   user: null,
-  token: null, // Inicialmente no hay token
+  token: null,
   darkMode: false,
   notifications: [
     { id: 1, message: 'Se ha validado la investigación', date: '2024-03-15', read: false },
     { id: 2, message: 'Nueva secuencia didáctica disponible', date: '2024-03-14', read: false },
   ],
-  
-  // Función para establecer el usuario
+  role: null,
   setUser: (user) => {
     set({ user });
   },
-
-  
-  // Función para establecer el token
   setToken: (token) => set({ token }),
-
-  // Función para alternar entre el modo oscuro
   toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
-  
-  // Función para agregar una nueva notificación
-  addNotification: (notification) => 
-    set((state) => ({ notifications: [...state.notifications, notification] })),
-  
-  // Función para hacer logout y limpiar los datos
+  addNotification: (notification) => set((state) => ({ notifications: [...state.notifications, notification] })),
   logout: () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
@@ -50,5 +39,5 @@ export const useStore = create<Store>((set) => ({
     } else {
       console.log('Error al eliminar los datos de usuario');
     }
-  }
+  },
 }));
