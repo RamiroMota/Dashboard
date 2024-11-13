@@ -17,7 +17,7 @@ const UserModal: React.FC<UserModalProps> = ({ selectedUser, showPassword, toggl
       <div className="space-y-3">
         <p><strong>Nombre:</strong> {selectedUser.Nombre}</p>
         <p><strong>Apellidos:</strong> {selectedUser.Apellidos}</p>
-        <p><strong>Rol:</strong> {selectedUser.roleName}</p>
+        <p><strong>Rol:</strong> {selectedUser.Rol}</p>
         <p><strong>Función:</strong> {selectedUser.Funcion}</p>
         <p><strong>Creado el:</strong> {formatDate(selectedUser.CreadoEl)}</p>
         <p><strong>Actualizado el:</strong> {formatDate(selectedUser.ActualizadoEl)}</p>

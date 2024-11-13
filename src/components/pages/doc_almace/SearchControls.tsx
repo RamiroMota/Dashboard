@@ -18,16 +18,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, selectedT
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search files..."
-        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
       />
       <select
         value={selectedType || ''}
         onChange={(e) => onTypeChange(e.target.value || null)}
         className="ml-4 border border-gray-300 rounded-lg"
       >
-        <option value="">All Types</option>
-        <option value="image">Images</option>
-        <option value="document">Documents</option>
+        <option value="">Todos</option>
+        <option value="image">Imagen</option>
+        <option value="document">Documento</option>
       </select>
     </div>
   );
