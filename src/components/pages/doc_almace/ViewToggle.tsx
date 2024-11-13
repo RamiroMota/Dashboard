@@ -1,28 +1,31 @@
 import React from 'react';
-import { LayoutGrid, List } from 'lucide-react';
+import { Grid, List } from 'lucide-react';
+import { ViewMode } from '../../types/file';
 
 interface ViewToggleProps {
-  isGridView: boolean;
-  onToggle: () => void;
+  view: ViewMode;
+  onViewChange: (view: ViewMode) => void;
 }
 
-export const ViewToggle: React.FC<ViewToggleProps> = ({ isGridView, onToggle }) => {
+export const ViewToggle: React.FC<ViewToggleProps> = ({ view, onViewChange }) => {
   return (
-    <button
-      onClick={onToggle}
-      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 dark:bg-gray-600 dark:text-white bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-    >
-      {isGridView ? (
-        <>
-          <List className="w-4 h-4" />
-          Vista Lista
-        </>
-      ) : (
-        <>
-          <LayoutGrid className="w-4 h-4" />
-          Vista Cuadrícula
-        </>
-      )}
-    </button>
+    <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+      <button
+        onClick={() => onViewChange('grid')}
+        className={`p-2 rounded ${
+          view === 'grid' ? 'bg-white shadow' : 'hover:bg-gray-200'
+        }`}
+      >
+        <Grid size={20} />
+      </button>
+      <button
+        onClick={() => onViewChange('list')}
+        className={`p-2 rounded ${
+          view === 'list' ? 'bg-white shadow' : 'hover:bg-gray-200'
+        }`}
+      >
+        <List size={20} />
+      </button>
+    </div>
   );
 };
