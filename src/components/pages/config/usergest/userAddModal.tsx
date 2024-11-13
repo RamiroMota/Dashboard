@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { roles, funciones } from './userRolesFunciones'; // Asegúrate de que la ruta sea correcta
 
 interface UserAddModalProps {
   isOpen: boolean;
   toggleModal: () => void;
-  onAddUser: (newUser: User) => void;
+  onAddUser: (newUser: User) => void; // Añadimos la función onAddUser
 }
 
 interface User {
@@ -11,7 +12,7 @@ interface User {
   Apellidos: string;
   Correo: string;
   Contraseña: string;
-  Rol: string;
+  Rol: string; // Aquí 'Rol' debe ser una cadena
   Funcion: string;
 }
 
@@ -20,10 +21,10 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
   const [apellidos, setApellidos] = useState('');
   const [correo, setCorreo] = useState('');
   const [contraseña, setContraseña] = useState('');
-  const [rol, setRol] = useState('');
+  const [rol, setRol] = useState(''); // 'rol' debe ser de tipo string
   const [funcion, setFuncion] = useState('');
   const [showConfirmClose, setShowConfirmClose] = useState(false);
-  const nombreRef = useRef<HTMLInputElement>(null); // Crear referencia para el campo "Nombre"
+  const nombreRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,15 +36,15 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
       Rol: rol,
       Funcion: funcion,
     };
-    onAddUser(newUser);
+    onAddUser(newUser); // Llamamos a la función onAddUser con el objeto newUser
     toggleModal();
   };
 
   const closeModal = () => {
     if (nombre || apellidos || correo || contraseña || rol || funcion) {
-      setShowConfirmClose(true); // Mostrar confirmación si hay datos
+      setShowConfirmClose(true);
     } else {
-      toggleModal(); // Cerrar directamente si está vacío
+      toggleModal();
     }
   };
 
@@ -62,7 +63,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
 
   useEffect(() => {
     if (isOpen && nombreRef.current) {
-      nombreRef.current.focus(); // Enfocar automáticamente en el campo "Nombre" al abrir el modal
+      nombreRef.current.focus();
     }
   }, [isOpen]);
 
@@ -80,7 +81,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
               type="text"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
-              ref={nombreRef} // Asignar la referencia al campo "Nombre"
+              ref={nombreRef}
               className="w-full border rounded p-2"
               required
             />
@@ -128,9 +129,11 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
               required
             >
               <option value="">Seleccionar Rol</option>
-              <option value="Admin">Administrador</option>
-              <option value="Editor">Editor</option>
-              <option value="Viewer">Observador</option>
+              {roles.map((role) => (
+                <option key={role.id} value={role.name}>
+                  {role.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="mb-4">
@@ -143,11 +146,11 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
               required
             >
               <option value="">Seleccionar Función</option>
-              <option value="Docente">Docente</option>
-              <option value="Gestor">Gestor</option>
-              <option value="Administrador">Administrador</option>
-              <option value="Supervisor">Supervisor</option>
-              <option value="Coordinador">Coordinador</option>
+              {funciones.map((funcion) => (
+                <option key={funcion.id} value={funcion.name}>
+                  {funcion.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex justify-between">
@@ -172,7 +175,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
             <div className="bg-white p-4 rounded-md shadow-lg w-full max-w-sm">
               <p className="mb-4">¿Estás seguro que deseas cerrar el formulario?</p>
               <div className="flex justify-center">
-                <button
+                <button type="button"
                   className="px-6 py-2 mx-6 bg-red-500 text-white rounded hover:bg-red-700 transition"
                   onClick={() => {
                     setShowConfirmClose(false);
@@ -181,7 +184,7 @@ const UserAddModal: React.FC<UserAddModalProps> = ({ isOpen, toggleModal, onAddU
                 >
                   Sí
                 </button>
-                <button
+                <button type="button"
                   className="px-6 py-2 mx-6 bg-gray-400 text-white rounded hover:bg-gray-700 transition"
                   onClick={() => setShowConfirmClose(false)}
                 >

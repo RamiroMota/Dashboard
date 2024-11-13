@@ -13,7 +13,8 @@ const UserPagination: React.FC<PaginationProps> = ({ currentPage, totalPages, pa
       onClick={() => paginate(currentPage - 1)}
       disabled={currentPage === 1}
       className={`px-3 py-1 mx-1 bg-gray-300 rounded-md transition duration-300 ease-in-out 
-        ${totalPages > 1 ? 'hover:bg-orange-500' : ''} 
+        ${currentPage !== 1 ? 'hover:bg-gray-700 hover:text-white hover:transition' : ''} 
+        ${currentPage === 1 ? 'hover:bg-none' : ''} 
         disabled:opacity-50`}
     >
       Atrás
@@ -26,8 +27,8 @@ const UserPagination: React.FC<PaginationProps> = ({ currentPage, totalPages, pa
         onClick={() => paginate(index + 1)}
         className={`px-3 py-1 mx-1 rounded-md transition duration-300 ease-in-out 
           ${currentPage === index + 1
-            ? 'bg-gray-900 text-white hover:bg-orange-500'
-            : 'bg-gray-300 hover:bg-orange-500'}`}
+            ? 'bg-gray-800 text-white hover:bg-gray-800'
+            : 'bg-gray-300 hover:bg-gray-400'}`}
       >
         {index + 1}
       </button>
@@ -38,7 +39,8 @@ const UserPagination: React.FC<PaginationProps> = ({ currentPage, totalPages, pa
       onClick={() => paginate(currentPage + 1)}
       disabled={currentPage === totalPages}
       className={`px-3 py-1 mx-1 bg-gray-300 rounded-md transition duration-300 ease-in-out 
-        ${totalPages > 1 ? 'hover:bg-orange-500' : ''} 
+        ${currentPage !== totalPages ? 'hover:bg-gray-700 hover:text-white hover:transition' : ''} 
+        ${currentPage === totalPages ? 'hover' : ''} 
         disabled:opacity-50`}
     >
       Adelante
