@@ -31,4 +31,3 @@ mongoose.connect(process.env.MONGO_URI)
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
