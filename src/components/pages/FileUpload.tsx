@@ -1,90 +1,153 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FileUploader } from './doc_almace/FileUploader';
-import { FileList } from './doc_almace/FileList';
-import { SearchAndFilter } from './doc_almace/SearchAndFilter';
-import { ViewToggle } from './doc_almace/ViewToggle';
-import { FileItem, FileType } from '../types/file';
-import { FolderOpen } from 'lucide-react';
-import { getFileType } from '../utils/fileHelpers';
+import { ProgressBar } from './doc_almace/ProgressBar';
+import { ErrorMessage } from './doc_almace/ErrorMessage';
+import { LoadingSpinner } from './doc_almace/LoadingSpinner';
+import { FileGrid } from './doc_almace/FileGrid';
+import { Header } from './doc_almace/Header';
+import { SearchBar } from './doc_almace/SearchControls';
+import { FileItem, ViewMode } from '../types/file';
+import { uploadFiles, getFiles, deleteFile, downloadFile } from '../types/fileUpload';
 
 function FileUpload() {
   const [files, setFiles] = useState<FileItem[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<FileType | 'all'>('all');
-  const [isGridView, setIsGridView] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [fileType, setFileType] = useState<string | null>(null);
+  const [view, setView] = useState<ViewMode>('grid');
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFileUpload = (uploadedFiles: File[]) => {
-    const newFiles: FileItem[] = uploadedFiles.map((file) => ({
-      id: crypto.randomUUID(),
-      name: file.name,
-      type: file.type,
-      size: file.size,
-      url: URL.createObjectURL(file),
-      createdAt: new Date(),
-    }));
+  const loadFiles = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const fetchedFiles = await getFiles();
+      const sanitizedFiles = fetchedFiles.map(file => ({
+        ...file,
+        createdAt: new Date(file.createdAt).toISOString(),
+        id: String(file.id), // Ensure ID is a string
+        size: Number(file.size), // Ensure size is a number
+      }));
+      setFiles(sanitizedFiles);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load files';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    setFiles((prev) => [...prev, ...newFiles]);
+  useEffect(() => {
+    loadFiles();
+  },[loadFiles]);
+
+  const handleUpload = async (newFiles: File[]) => {
+    try {
+      setUploadProgress(0);
+      setError(null);
+      const uploadedFiles = await uploadFiles(newFiles);
+      const sanitizedFiles = uploadedFiles.map(file => ({
+        ...file,
+        createdAt: new Date(file.createdAt).toISOString(),
+        id: String(file.id),
+        size: Number(file.size),
+      }));
+      setFiles(prev => [...sanitizedFiles, ...prev]);
+      setUploadProgress(100);
+      setTimeout(() => setUploadProgress(0), 1000);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload files';
+      setError(errorMessage);
+      setUploadProgress(0);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setFiles((prev) => {
-      const fileToDelete = prev.find(file => file.id === id);
-      if (fileToDelete?.url) {
-        URL.revokeObjectURL(fileToDelete.url);
+  const handleDelete = async (id: string) => {
+    try {
+      setError(null);
+      await deleteFile(id);
+      setFiles(prev => prev.filter(file => file.id !== id));
+      setSelectedFiles(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete file';
+      setError(errorMessage);
+    }
+  };
+
+  const handleDownload = async (id: string, filename: string) => {
+    try {
+      setError(null);
+      await downloadFile(id, filename);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to download file';
+      setError(errorMessage);
+    }
+  };
+
+  const toggleFileSelection = (id: string) => {
+    setSelectedFiles(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
       }
-      return prev.filter((file) => file.id !== id);
+      return next;
     });
   };
 
-  const filteredFiles = useMemo(() => {
-    return files.filter((file) => {
-      const matchesSearch = file.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const fileType = getFileType(file.type);
-      const matchesType = selectedType === 'all' || fileType === selectedType;
-      return matchesSearch && matchesType;
-    });
-  }, [files, searchTerm, selectedType]);
+  const filteredFiles = files.filter(file => {
+    const matchesSearch = file.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesType = !fileType || 
+      (fileType === 'image' && file.type.startsWith('image/')) ||
+      (fileType === 'document' && !file.type.startsWith('image/'));
+    return matchesSearch && matchesType;
+  });
 
   return (
-    <div className="min-h-screen dark:bg-slate-800 rounded-lg bg-gray-50 shadow-lg shadow-gray-300 dark:shadow-none">
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="flex items-center space-x-4 mb-8">
-          <FolderOpen className="w-8 h-8 text-orange-500" />
-          <h1 className="text-2xl font-bold dark:text-white text-gray-900">
-            Gestor de Archivos
-          </h1>
-        </div>
-
-        <div className="space-y-8">
-          <FileUploader onFileUpload={handleFileUpload} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 rounded-lg">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-6">
+          <Header view={view} onViewChange={setView} />
+          <FileUploader onUpload={handleUpload} />
           
-          {files.length > 0 && (
-            <div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 className="text-lg font-semibold dark:text-slate-300 text-gray-700">
-                  Archivos Subidos ({filteredFiles.length} de {files.length})
-                </h2>
-                <ViewToggle isGridView={isGridView} onToggle={() => setIsGridView(!isGridView)} />
-              </div>
+          {uploadProgress > 0 && (
+            <div className="mt-4">
+              <ProgressBar progress={uploadProgress} />
+            </div>
+          )}
 
-              <SearchAndFilter
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                selectedType={selectedType}
-                onTypeChange={setSelectedType}
-              />
+          {error && <ErrorMessage message={error} />}
 
-              {filteredFiles.length > 0 ? (
-                <FileList 
-                  files={filteredFiles} 
-                  onDelete={handleDelete}
-                  isGridView={isGridView}
-                />
-              ) : (
-                <div className="text-center py-12 dark:bg-gray-700 bg-white rounded-lg">
-                  <p className="dark:text-gray-300 text-gray-500">No se encontraron archivos que coincidan con tu búsqueda</p>
-                </div>
-              )}
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            selectedType={fileType}
+            onTypeChange={setFileType}
+          />
+
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <FileGrid
+              files={filteredFiles}
+              view={view}
+              selectedFiles={selectedFiles}
+              onSelect={toggleFileSelection}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
+            />
+          )}
+
+          {!isLoading && filteredFiles.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 font-medium">No files found</p>
             </div>
           )}
         </div>

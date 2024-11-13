@@ -5,9 +5,6 @@ const User = require('../models/User');  // Importar el modelo de User
 // Configurar dotenv
 dotenv.config();
 
-// Conectar a MongoDB
-mongoose.connect(process.env.MONGO_URI)
-
 const getUsuarios = async () => {
   return User.aggregate([
     {
