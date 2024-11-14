@@ -1,89 +1,76 @@
 import React from 'react';
 import { Download, Trash2, FileIcon } from 'lucide-react';
 import { FileItem } from '../../types/file';
-import { formatFileSize } from '../../utils/FileUtils';
+import { useFileStore } from '../../store/useFileStore';
 
 interface FileCardProps {
   file: FileItem;
-  view: 'grid' | 'list';
-  isSelected: boolean;
-  onSelect: (id: string) => void;
-  onDownload: (id: string, name: string) => void;
-  onDelete: (id: string) => void;
 }
 
-export const FileCard: React.FC<FileCardProps> = ({
-  file,
-  view,
-  isSelected,
-  onSelect,
-  onDownload,
-  onDelete,
-}) => {
-  const isImage = file.type.startsWith('image/');
-  const preview = isImage ? file.url : null;
+export const FileCard: React.FC<FileCardProps> = ({ file }) => {
+  const { removeFile, toggleFileSelection, selectedFiles } = useFileStore();
+  const isSelected = selectedFiles.has(file.id);
 
-  const CardContent = () => (
-    <>
-      <div className="relative group">
-        <div className={`aspect-square rounded-lg overflow-hidden bg-gray-100 
-          ${view === 'list' ? 'w-12 h-12' : 'w-full'}`}>
-          {preview ? (
-            <img
-              src={preview}
-              alt={file.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              <FileIcon size={24} />
-            </div>
-          )}
-        </div>
-        <div className={`absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
-          transition-opacity flex items-center justify-center opacity-0 group-hover:opacity-100`}>
+  const handleDownload = () => {
+    const url = URL.createObjectURL(file.file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div
+      className={`relative p-4 border hover:shadow-lg rounded-lg cursor-pointer transition-all dark:text-gray-300
+        ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:shadow-lg hover:border-blue-300'}`}
+      onClick={() => toggleFileSelection(file.id)}
+    >
+      <div className="aspect-square mb-2">
+        {file.type.startsWith('image/') ? (
+          <img
+            src={file.preview}
+            alt={file.name}
+            className="w-full h-full object-cover rounded"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded">
+            <FileIcon className="w-12 h-12 text-gray-400" />
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <p className="font-medium truncate" title={file.name}>
+          {file.name}
+        </p>
+        <p className="text-sm text-gray-500">
+          {(file.size / 1024 / 1024).toFixed(2)} MB
+        </p>
+
+        <div className="flex gap-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDownload(file.id, file.name);
+              handleDownload();
             }}
-            className="p-2 bg-white rounded-full mx-1 hover:bg-gray-100"
+            className="p-2 text-blue-600 hover:bg-blue-500 hover:text-white rounded-full"
           >
-            <Download size={16} />
+            <Download className="w-4 h-4" />
           </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onDelete(file.id);
+              removeFile(file.id);
             }}
-            className="p-2 bg-white rounded-full mx-1 hover:bg-gray-100"
+            className="p-2 hover:bg-red-500 hover:text-white rounded-full text-red-500"
           >
-            <Trash2 size={16} className="text-red-500" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
-      <div className={view === 'list' ? 'ml-4 flex-grow' : 'mt-2'}>
-        <p className="font-medium truncate">{file.name}</p>
-        <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>
-      </div>
-    </>
-  );
-
-  return view === 'grid' ? (
-    <div
-      onClick={() => onSelect(file.id)}
-      className={`p-4 rounded-lg cursor-pointer transition-all
-        ${isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'}`}
-    >
-      <CardContent />
-    </div>
-  ) : (
-    <div
-      onClick={() => onSelect(file.id)}
-      className={`p-4 flex items-center rounded-lg cursor-pointer transition-all
-        ${isSelected ? 'bg-blue-50 ring-2 ring-blue-500' : 'hover:bg-gray-50'}`}
-    >
-      <CardContent />
     </div>
   );
 };

@@ -3,10 +3,9 @@ export interface FileItem {
   name: string;
   type: string;
   size: number;
-  url: string;
-  createdAt: string;
-  preview?: string;
+  preview: string;
+  lastModified: number;
+  file: File;
 }
 
 export type ViewMode = 'grid' | 'list';
-export type FileType = 'image/jpeg' | 'image/jpg' | 'image/png' | 'application/pdf' | 'application/msword' | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
